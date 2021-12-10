@@ -4,7 +4,11 @@ inputs:
   arm-profiles-repo:
     description: 'arm-profiles to clone'
     required: false
-    default: 'https://gitlab.manjaro.org/manjaro-arm/applications/arm-profiles'
+    default: 'https://github.com/manjaro-libhybris/arm-profiles.git'
+  halium-templates-repo:
+    description: 'android-recovery-flashing-template to clone'
+    required: false
+    default: 'https://github.com/manjaro-libhybris/android-recovery-flashing-template.git'
   device:
     description: 'name of the device the build is for'
     required: true
@@ -155,6 +159,13 @@ runs:
         REPO: ${{ inputs.arm-profiles-repo }}
       run: |
         sudo git clone --depth 1 ${REPO} arm-profiles         
+    - 
+      name: checkout-halium-templates
+      shell: bash
+      env:
+        REPO: ${{ inputs.halium-templates-repo }}
+      run: |
+        sudo git clone --depth 1 ${REPO} android-recovery-flashing-template
     -
       id: build
       shell: bash
@@ -168,6 +179,7 @@ runs:
         #CI_GPG_PASSPHRASE: ${{ inputs.CI_GPG_PASSPHRASE }}
       run: |
         sudo mv -v $GITHUB_WORKSPACE/arm-profiles /usr/share/manjaro-arm-tools/profiles
+        sudo mv -v $GITHUB_WORKSPACE/android-recovery-flashing-template /usr/share/manjaro-arm-tools/templates
         if [ -z ${{ inputs.overlay-repo }} ]; then 
           sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH
         else
