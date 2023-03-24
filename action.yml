@@ -25,7 +25,7 @@ inputs:
     default: "YY.MM"
   overlay-repo:
     description: 'custom overlay repo'
-    required: false
+    required: true
     default: 'https://mirror.bardia.tech/manjaro-libhybris/aarch64/manjaro-libhybris.db'
 
 outputs:
