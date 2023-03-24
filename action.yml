@@ -26,15 +26,7 @@ inputs:
   overlay-repo:
     description: 'custom overlay repo'
     required: false
-#  CI_PUB_KEY:
-#    description: 'public gpg key to use'
-#    required: true
-#  CI_GPG_SECRET: 
-#    description: 'private key to use'
-#    required: true
-#  CI_GPG_PASSPHRASE: 
-#    description: 'passphrase for private key'
-#    required: true
+
 outputs:
   file-pkg:
     description: "compressed files"
@@ -54,7 +46,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    -  
+    -
       name: install-build-dependencies
       shell: bash
       run: |
@@ -86,7 +78,7 @@ runs:
           u-boot-tools
         sudo pip3 install meson
         sudo pip3 install ninja
-          
+
     - id: install-pacman
       shell: bash
       env:
@@ -119,8 +111,8 @@ runs:
       run: |
         sudo wget https://gitlab.manjaro.org/packages/community/manjaro-arm-qemu-static/-/raw/master/qemu-static.conf -O /usr/lib/binfmt.d/qemu-static.conf
         sudo service systemd-binfmt restart
-          
-    - 
+
+    -
       name: install-arch-install-scripts
       shell: bash
       env:
@@ -148,18 +140,18 @@ runs:
             sudo install -Dm755 $pkgname/lib/manjaro-arm-tools.conf /etc/manjaro-arm-tools/
         }
         install_m_a_tools
-          
-        sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh   
+
+        sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
         sudo sed -i -e 's|1> /dev/null 2>&1||g' /usr/share/manjaro-arm-tools/lib/functions.sh
-        sudo sed -i -e 's|2>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh 
-    - 
+        sudo sed -i -e 's|2>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
+    -
       name: checkout-arm-profiles
       shell: bash
       env:
         REPO: ${{ inputs.arm-profiles-repo }}
       run: |
-        sudo git clone --depth 1 ${REPO} arm-profiles         
-    - 
+        sudo git clone --depth 1 ${REPO} arm-profiles
+    -
       name: checkout-halium-templates
       shell: bash
       env:
@@ -174,84 +166,33 @@ runs:
         EDITION: ${{ inputs.edition }}
         BRANCH: ${{ inputs.branch }}
         VERSION: ${{ inputs.version }}
-        #CI_PUB_KEY: ${{ inputs.CI_PUB_KEY }}
-        #CI_GPG_SECRET: ${{ inputs.CI_GPG_SECRET }}
-        #CI_GPG_PASSPHRASE: ${{ inputs.CI_GPG_PASSPHRASE }}
+
       run: |
         sudo mv -v $GITHUB_WORKSPACE/arm-profiles /usr/share/manjaro-arm-tools/profiles
         sudo mv -v $GITHUB_WORKSPACE/android-recovery-flashing-template /usr/share/manjaro-arm-tools/templates
-        if [ -z ${{ inputs.overlay-repo }} ]; then 
+        if [ -z ${{ inputs.overlay-repo }} ]; then
           sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH
         else
           sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH -k ${{ inputs.overlay-repo }}
         fi
-          
+
         ls -lasih /var/cache/manjaro-arm-tools/img
-          
+
         FILE_PATH=$(find /var/cache/manjaro-arm-tools/img -type f -name "*.zip" -exec stat -c '%Y %n' {} \; | sort -nr | awk 'NR==1 {print $2}')
         cp -v $FILE_PATH .
         echo "::set-output name=file-path::$(basename $FILE_PATH)"
-          
+
         sha1sum $(basename $FILE_PATH) > $(basename $FILE_PATH).sha1
         echo "::set-output name=file-sha1::$(basename $FILE_PATH).sha1"
         mktorrent -v -a udp://tracker.opentrackr.org:1337 -l 21 -w https://github.com/$GITHUB_REPOSITORY/releases/download/$VERSION/$(basename $FILE_PATH) -o $(basename $FILE_PATH).torrent $(basename $FILE_PATH)
         echo "::set-output name=file-torrent::$(basename $FILE_PATH).torrent"
-        
-        # Do GPG signing
-        #echo "setup values"
-        #GPG_HOMEDIR="$(mktemp -d -t gnupg.XXX)"
-        #SECRET_KEY_FILE="$GPG_HOMEDIR/secret.key"
-        #PUBLIC_KEY_FILE="$GPG_HOMEDIR/public_key.gpg"
-        #PASSPHRASE_FILE="$GPG_HOMEDIR/passphrase.file"
-        #GPG="gpg --homedir=$GPG_HOMEDIR --no-tty --batch --yes"
-          
-        #echo "unpack public key"
-        #echo "$CI_PUB_KEY" | base64 --decode > "$PUBLIC_KEY_FILE"
 
-        #echo "unpack secret key"
-        #echo "$CI_GPG_SECRET" | base64 --decode > "$SECRET_KEY_FILE"
-          
-        #echo "passphrase"
-        #echo "$CI_GPG_PASSPHRASE" > "$PASSPHRASE_FILE"
-          
-        #echo "Secrets unpacked..."
-
-        #paperkey --pubring "$PUBLIC_KEY_FILE" --secrets "$SECRET_KEY_FILE" \
-        #| $GPG --import &>/dev/null
-
-        #$GPG --pinentry-mode loopback --detach-sign --use-agent -u "$CI_GPG_KEY" --passphrase-file "$PASSPHRASE_FILE" $(basename $FILE_PATH)
-
-        #ls -lasih
-          
-        #echo "Verifying file"
-        #$GPG --verify $(basename $FILE_PATH).sig $(basename $FILE_PATH)
-        #echo "::set-output name=file-signature::$(basename $FILE_PATH).sig"
-          
-        #echo "cleaning up"
-        #find "$GPG_HOMEDIR" -type f -exec shred {} \;
-        #rm -rf "$GPG_HOMEDIR"
-        #echo "script done"
-          
         # Copy filepaths
         echo "FILE_PATH=$(basename $FILE_PATH)" >> $GITHUB_ENV
         echo "FILE_SHA1=$(basename $FILE_PATH).sha1" >> $GITHUB_ENV
         echo "FILE_TORRENT=$(basename $FILE_PATH).torrent" >> $GITHUB_ENV
-        #echo "FILE_SIG=$(basename $FILE_PATH).sig" >> $GITHUB_ENV
-          
+
         FILE_PKG=$(find /var/cache/manjaro-arm-tools/img -type f -name "*-pkgs.txt" -exec stat -c '%Y %n' {} \; | sort -nr | awk 'NR==1 {print $2}')
         cp -v $FILE_PKG .
         echo "::set-output name=file-pkg::$(basename $FILE_PKG)"
         echo "FILE_PKG=$(basename $FILE_PKG)" >> $GITHUB_ENV
-
-#    -
-#      id: gpg_sign
-#      shell: bash
-#      run: |
-#        if [ -z "${{ inputs.CI_GPG_SECRET }}" ]; then 
-#          echo "no gpg secret given"
-#          exit 0
-#        fi
-#        cat <(echo -e "${{ inputs.CI_GPG_SECRET }}" | base64 --decode) | gpg --batch --import
-#        shopt -s extglob
-#        gpg --pinentry-mode loopback --passphrase "${{ inputs.CI_GPG_PASSPHRASE }}" --detach-sign $(basename $FILE_PATH)
-#        echo "FILE_SIG=$(basename $FILE_PATH).sig" >> $GITHUB_ENV

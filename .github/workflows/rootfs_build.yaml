@@ -8,16 +8,16 @@ jobs:
   prepare_release:
     runs-on: ubuntu-latest
     steps:
-      - 
+      -
         uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-      - 
+      -
         id: time
         uses: nanzm/get-time-action@v1.1
         with:
           format: 'YYYYMMDD'
-      - 
+      -
         id: release
         uses: actions/create-release@v1
         env:
@@ -35,16 +35,16 @@ jobs:
     runs-on: ubuntu-20.04
     needs: prepare_release
     steps:
-      - 
+      -
         uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
-      - 
+      -
         id: time
         uses: nanzm/get-time-action@v1.1
         with:
           format: 'YYYYMMDD'
-      -  
+      -
         name: install-build-dependencies
         shell: bash
         run: |
@@ -71,7 +71,7 @@ jobs:
             qemu-user-static
           sudo pip3 install meson
           sudo pip3 install ninja
-          
+
       -
         name: install-pacman
         shell: bash
@@ -105,8 +105,8 @@ jobs:
         run: |
           sudo wget https://gitlab.manjaro.org/packages/community/manjaro-arm-qemu-static/-/raw/master/qemu-static.conf -O /usr/lib/binfmt.d/qemu-static.conf
           sudo service systemd-binfmt restart
-          
-      - 
+
+      -
         name: install-arch-install-scripts
         shell: bash
         env:
@@ -134,24 +134,24 @@ jobs:
               sudo install -Dm755 $pkgname/lib/manjaro-arm-tools.conf /etc/manjaro-arm-tools/
           }
           install_m_a_tools
-          
-          sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh   
+
+          sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
           sudo sed -i -e 's|1> /dev/null 2>&1||g' /usr/share/manjaro-arm-tools/lib/functions.sh
-          sudo sed -i -e 's|2>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh 
+          sudo sed -i -e 's|2>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
       -
         name: build
         shell: bash
         run: |
           sudo buildrootfs
-          
+
           ls -lasih /var/cache/manjaro-arm-tools/img
-          
+
           FILE_PATH=$(find /var/cache/manjaro-arm-tools/img -type f -name "*.tar.gz" -exec stat -c '%Y %n' {} \; | sort -nr | awk 'NR==1 {print $2}')
           cp -v $FILE_PATH .
 
           echo "FILE_PATH=$(basename $FILE_PATH)" >> $GITHUB_ENV
-      - 
-        id: upload_release 
+      -
+        id: upload_release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -160,7 +160,7 @@ jobs:
           asset_path: ./${{ env.FILE_PATH }}
           asset_name: ${{ env.FILE_PATH }}
           asset_content_type: application/gzip
-      - 
+      -
         name: rollback_release
         if: failure()
         uses: author/action-rollback@stable
