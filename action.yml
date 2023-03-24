@@ -26,6 +26,7 @@ inputs:
   overlay-repo:
     description: 'custom overlay repo'
     required: false
+    default: 'https://mirror.bardia.tech/manjaro-libhybris/aarch64/manjaro-libhybris.db'
 
 outputs:
   file-pkg:
