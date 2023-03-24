@@ -23,10 +23,6 @@ inputs:
     description: 'image version'
     required: false
     default: "YY.MM"
-  overlay-repo:
-    description: 'custom overlay repo'
-    required: true
-    default: 'https://mirror.bardia.tech/manjaro-libhybris/aarch64/manjaro-libhybris.db'
 
 outputs:
   file-pkg:
@@ -171,11 +167,8 @@ runs:
       run: |
         sudo mv -v $GITHUB_WORKSPACE/arm-profiles /usr/share/manjaro-arm-tools/profiles
         sudo mv -v $GITHUB_WORKSPACE/android-recovery-flashing-template /usr/share/manjaro-arm-tools/templates
-        if [ -z ${{ inputs.overlay-repo }} ]; then
-          sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH
-        else
-          sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH -k ${{ inputs.overlay-repo }}
-        fi
+
+        sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH -k https://mirror.bardia.tech/manjaro-libhybris/aarch64/manjaro-libhybris.db
 
         ls -lasih /var/cache/manjaro-arm-tools/img
 
