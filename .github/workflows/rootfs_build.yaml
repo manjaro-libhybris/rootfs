@@ -76,7 +76,7 @@ jobs:
         name: install-pacman
         shell: bash
         env:
-          PACMAN_VERSION: 6.0.1
+          PACMAN_VERSION: 6.0.2
         run: |
           sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
           pushd pacman
@@ -110,7 +110,7 @@ jobs:
         name: install-arch-install-scripts
         shell: bash
         env:
-          VERSION: 24
+          VERSION: 28
         run: |
           sudo wget https://github.com/archlinux/arch-install-scripts/archive/refs/tags/v${VERSION}.tar.gz -O arch-install-scripts.tar.gz
           sudo tar -xvf arch-install-scripts.tar.gz
@@ -121,8 +121,8 @@ jobs:
         name: install-manjaro-arm-tools
         shell: bash
         run: |
-          sudo git clone https://gitlab.manjaro.org/manjaro-arm/applications/manjaro-arm-tools.git
-          install_m_a_tools() {
+          sudo git clone https://github.com/manjaro-libhybris/manjaro-arm-tools
+          install_manjaro_arm_tools() {
               pkgname=manjaro-arm-tools
               sudo install -dm777 /usr/share/$pkgname/lib
               sudo install -dm777 /usr/share/$pkgname/profiles
@@ -133,7 +133,7 @@ jobs:
               sudo install -Dm755 $pkgname/bin/* /usr/bin/
               sudo install -Dm755 $pkgname/lib/manjaro-arm-tools.conf /etc/manjaro-arm-tools/
           }
-          install_m_a_tools
+          install_manjaro_arm_tools
 
           sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
           sudo sed -i -e 's|1> /dev/null 2>&1||g' /usr/share/manjaro-arm-tools/lib/functions.sh
