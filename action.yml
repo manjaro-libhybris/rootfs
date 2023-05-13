@@ -138,9 +138,6 @@ runs:
         }
         install_manjaro_arm_tools
 
-        sudo sed -i -e 's|1>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
-        sudo sed -i -e 's|1> /dev/null 2>&1||g' /usr/share/manjaro-arm-tools/lib/functions.sh
-        sudo sed -i -e 's|2>/dev/null||g' /usr/share/manjaro-arm-tools/lib/functions.sh
     -
       name: checkout-arm-profiles
       shell: bash
@@ -168,7 +165,7 @@ runs:
         sudo mv -v $GITHUB_WORKSPACE/arm-profiles /usr/share/manjaro-arm-tools/profiles
         sudo mv -v $GITHUB_WORKSPACE/android-recovery-flashing-template /usr/share/manjaro-arm-tools/templates
 
-        sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH -k https://mirror.bardia.tech/manjaro-libhybris/aarch64/manjaro-libhybris.db
+        sudo buildhaliumzip -d $DEVICE -e $EDITION -v $VERSION -b $BRANCH
 
         ls -lasih /var/cache/manjaro-arm-tools/img
 
