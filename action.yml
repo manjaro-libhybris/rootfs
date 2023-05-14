@@ -162,11 +162,4 @@ runs:
         FILE_PATH=$(find /var/cache/manjaro-arm-tools/img -type f -name "*.zip" -exec stat -c '%Y %n' {} \; | sort -nr | awk 'NR==1 {print $2}')
         cp -v $FILE_PATH .
         echo "::set-output name=file-path::$(basename $FILE_PATH)"
-
-        # Copy filepaths
         echo "FILE_PATH=$(basename $FILE_PATH)" >> $GITHUB_ENV
-
-        FILE_PKG=$(find /var/cache/manjaro-arm-tools/img -type f -name "*-pkgs.txt" -exec stat -c '%Y %n' {} \; | sort -nr | awk 'NR==1 {print $2}')
-        cp -v $FILE_PKG .
-        echo "::set-output name=file-pkg::$(basename $FILE_PKG)"
-        echo "FILE_PKG=$(basename $FILE_PKG)" >> $GITHUB_ENV
