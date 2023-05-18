@@ -1,5 +1,5 @@
 name: 'Manjaro Image Action'
-description: 'Installs prerequisites for building Manjaro ARM on ubuntu'
+description: 'Installs prerequisites for building Manjaro libhybris on ubuntu'
 inputs:
   arm-profiles-repo:
     description: 'arm-profiles to clone'
