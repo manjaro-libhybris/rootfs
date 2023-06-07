@@ -185,13 +185,3 @@ runs:
       shell: bash
       run: |
         df -h
-
-    - name: Free Up GitHub Actions Ubuntu Runner Disk Space 🔧
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: true
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        swap-storage: true
