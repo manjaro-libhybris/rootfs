@@ -34,6 +34,22 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Free Up GitHub Actions Ubuntu Runner Disk Space 🔧
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+
+    -
+      name: show storage
+      shell: bash
+      run: |
+        df -h
+
     -
       name: install-build-dependencies
       shell: bash
@@ -163,3 +179,19 @@ runs:
         cp -v $FILE_PATH .
         echo "::set-output name=file-path::$(basename $FILE_PATH)"
         echo "FILE_PATH=$(basename $FILE_PATH)" >> $GITHUB_ENV
+
+    -
+      name: show storage
+      shell: bash
+      run: |
+        df -h
+
+    - name: Free Up GitHub Actions Ubuntu Runner Disk Space 🔧
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
